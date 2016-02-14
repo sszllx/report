@@ -16,9 +16,9 @@
   <widget class="QPushButton" name="submit">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>151</x>
      <y>320</y>
-     <width>93</width>
+     <width>100</width>
      <height>28</height>
     </rect>
    </property>
@@ -59,17 +59,26 @@
     </rect>
    </property>
    <property name="text">
-    <string>持续(分钟)</string>
+    <string>持续</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="duration">
+  <widget class="QComboBox" name="duration">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>260</y>
-     <width>361</width>
-     <height>31</height>
+     <width>87</width>
+     <height>22</height>
     </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <property name="currentText">
+    <string/>
+   </property>
+   <property name="maxVisibleItems">
+    <number>10</number>
    </property>
   </widget>
  </widget>
