@@ -15,6 +15,8 @@ Dialog::Dialog(QWidget *parent) :
 
     mModifyBtn = ui->modify;
     connect(mModifyBtn, &QPushButton::clicked, this, &Dialog::onModifyClicked);
+    mSubmitBtn = ui->submit;
+    connect(mSubmitBtn, &QPushButton::clicked, this, &Dialog::onSubmitClicked);
 }
 
 Dialog::~Dialog()
@@ -34,7 +36,8 @@ void Dialog::onSubmitClicked()
     bool ok;
     int duration = durationStr.toInt(&ok);
     if (!ok) {
-        throw QString("input error");
+//        throw QString("input error");
+        return;
     }
 
     int minutes = 0;
@@ -44,8 +47,8 @@ void Dialog::onSubmitClicked()
         minutes += duration * 60;
     }
 
-
-    emit submit();
+    QByteArray submitString = content.toUtf8().toBase64() + "\t" + QString("%1").arg(minutes).toLatin1().toBase64();
+    emit submit(submitString);
 }
 
 void Dialog::onModifyClicked(bool clicked)

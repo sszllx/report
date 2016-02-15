@@ -6,6 +6,11 @@
 
 Config::Config(QObject *parent) : QObject(parent)
 {
+
+}
+
+void Config::init()
+{
     QFile file(DATAPATH);
 
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {

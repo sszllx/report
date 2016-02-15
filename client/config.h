@@ -9,6 +9,8 @@ class Config : public QObject
 public:
     explicit Config(QObject *parent = 0);
 
+    void init();
+
 private:
     void processLine(const QString& str);
 };

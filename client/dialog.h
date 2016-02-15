@@ -20,11 +20,12 @@ private slots:
     void onModifyClicked(bool clicked);
 
 signals:
-    void submit();
+    void submit(const QByteArray&);
 
 private:
     Ui::Dialog *ui;
     QPushButton* mModifyBtn;
+    QPushButton* mSubmitBtn;
 };
 
 #endif // DIALOG_H

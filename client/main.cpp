@@ -11,10 +11,10 @@ int main(int argc, char *argv[])
 //    Dialog w;
 //    w.show();
 
+    Config cfg;
+    DiaController dctl;
     try {
-        Config cfg;
-
-        DiaController dctl;
+        cfg.init();
         dctl.onShowDialog();
         dctl.setConfig(&cfg);
     } catch (QString errString) {
