@@ -16,10 +16,15 @@ public:
     ~Dialog();
 
 private slots:
-    void on_submit_clicked();
+    void onSubmitClicked();
+    void onModifyClicked(bool clicked);
+
+signals:
+    void submit();
 
 private:
     Ui::Dialog *ui;
+    QPushButton* mModifyBtn;
 };
 
 #endif // DIALOG_H

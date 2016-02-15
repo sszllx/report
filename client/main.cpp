@@ -1,4 +1,8 @@
 #include <QApplication>
+#include <QDebug>
+#include <QFile>
+
+#include "config.h"
 #include "diacontroller.h"
 
 int main(int argc, char *argv[])
@@ -7,8 +11,15 @@ int main(int argc, char *argv[])
 //    Dialog w;
 //    w.show();
 
-    DiaController dctl;
-    dctl.onShowDialog();
+    try {
+        Config cfg;
+
+        DiaController dctl;
+        dctl.onShowDialog();
+        dctl.setConfig(&cfg);
+    } catch (QString errString) {
+        qDebug() << errString;
+    }
 
     return a.exec();
 }
