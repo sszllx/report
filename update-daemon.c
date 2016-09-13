@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -52,7 +53,13 @@ static int daemonize()
     return 0;
 }
 
-static void *read_cb(event_loop_mgr_t *mgr, int sock)
+void sig_handle(int sig)
+{
+
+}
+
+static void *
+read_cb(event_loop_mgr_t *mgr, int sock)
 {
 
     return NULL;
@@ -64,6 +71,8 @@ int main(int argc, char const *argv[])
     int sock[2];
     int ret;
     event_loop_mgr_t *mgr;
+
+    signal(SIGCHLD, sig_handle);
 
     daemonize();
 
