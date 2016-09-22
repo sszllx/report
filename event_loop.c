@@ -35,7 +35,7 @@ event_loop_mgr_t *event_loop_init()
 {
     event_loop_mgr_t *mgr;
 
-    mgr = calloc (sizeof(event_loop_mgr_t), 1);
+    mgr = calloc (1, sizeof(event_loop_mgr_t));
     if (unlikely (!mgr)) {
         return NULL;
     }
@@ -71,7 +71,7 @@ event_loop_read_add(event_loop_mgr_t *mgr,
     FD_SET(fd, &mgr->rfds);
     mgr->maxfd = mgr->maxfd > fd ? mgr->maxfd : (fd + 1);
 
-    socket_cb_t *scb = calloc(sizeof(socket_cb_t), 1);
+    socket_cb_t *scb = calloc(1, sizeof(socket_cb_t));
     scb->sock = fd;
     scb->cb = cb;
     list_add_tail(&scb->list, &mgr->sock_cb_list);

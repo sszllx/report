@@ -4,11 +4,14 @@
 typedef enum {
     ADD_MSG,
     DEL_MSG,
+    VERSION_CHANGED,
+    VERSION_DOWNLOAD,
     CODE_NUM,
 } code_t;
 
 typedef enum {
     REQUEST,
+    REPLY,
     OP_NUM,
 } op_t;
 

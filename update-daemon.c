@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
@@ -8,9 +9,11 @@
 #include <unistd.h>
 
 #include "client.h"
+#include "defs.h"
 #include "event_loop.h"
+#include "report_socket.h"
 
-static int daemonize()
+static UNUSED int daemonize()
 {
     pid_t pid, sid;
     int fd; 
@@ -61,9 +64,44 @@ void sig_handle(int sig)
 static void *
 read_cb(event_loop_mgr_t *mgr, int sock)
 {
+    int rlen;
+    char buffer[PACKAGE_SIZE];
+    report_header_t *rhdr;
+
+ retry:
+    rlen = read(sock, buffer, PACKAGE_SIZE);
+    if (rlen < 0 && errno == EINTR) {
+        goto retry;
+    }
+
+    rhdr = (report_header_t *)buffer;
+
+    switch (rhdr->code) {
+    case VERSION_CHANGED:
+        {
+            int version;
+            if (rhdr->op != REQUEST) {
+                break;
+            }
+
+            memcpy(&version, rhdr->data, sizeof(int));
+            printf("version updata: %d\n", version);
+        }
+        break;
+    default:
+        break;
+    }
 
     return NULL;
 }
+
+static UNUSED void *
+client_monitor(event_loop_mgr_t *mgr, int sock)
+{
+    printf("%s %d \n", __FUNCTION__, __LINE__);
+    return NULL;
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -71,13 +109,15 @@ int main(int argc, char const *argv[])
     int sock[2];
     int ret;
     event_loop_mgr_t *mgr;
+    int server_sock;
 
     signal(SIGCHLD, sig_handle);
 
-    daemonize();
+    // daemonize();
 
-    ret = socketpair(AF_LOCAL, 0, SOCK_STREAM, sock);
+    ret = socketpair(AF_UNIX, SOCK_STREAM, 0, sock);
     if (ret < 0) {
+        perror("create sockepair failed\n");
         return 1;
     }
 
@@ -91,16 +131,24 @@ int main(int argc, char const *argv[])
     if (pid == 0) {
         close (sock[0]);
         create_client (sock[1]);
+
         return 0;
     }
 
     close (sock[1]);
 
+    server_sock = connect_server();
+    if (server_sock < 0) {
+        perror("update connect server failed\n");
+        return 1;
+    }
+
     mgr = event_loop_init ();
-    event_loop_read_add (mgr, sock[0], read_cb);
+    event_loop_read_add (mgr, sock[0], client_monitor);
+    event_loop_read_add (mgr, server_sock, read_cb);
     event_loop_enter (mgr);
 
-    close (sock[0]);
+    // close (sock[0]);
 
     return 0;
 }

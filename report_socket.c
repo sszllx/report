@@ -1,3 +1,4 @@
+#include "defs.h"
 #include "report_socket.h"
 
 #include <errno.h>
@@ -171,3 +172,40 @@ err:
     free(rhdr);
     return NULL;
 }
+
+report_header_t *new_package0()
+{
+    report_header_t *rhdr;
+
+    rhdr = calloc(1, PACKAGE_SIZE);
+
+    return rhdr;
+}
+
+void free_package(report_header_t *h)
+{
+    if (unlikely(!h)) {
+        return;
+    }
+
+    free(h);
+}
+
+void init_package(report_header_t *h, code_t code, op_t op)
+{
+    h->code = code;
+    h->op = op;
+}
+
+int set_package_data(report_header_t *h, int data_len, void *data)
+{
+    if (data_len > PACKAGE_SIZE - sizeof(report_header_t)) {
+        return -1;
+    }
+
+    h->data_len = data_len;
+
+    memcpy(h->data, data, data_len);
+    return 0;
+}
+

@@ -19,7 +19,9 @@ client: $(CLI_SRC)
 SRV_SRC := \
 	server.c \
 	report_socket.c \
-	event_loop.c
+	event_loop.c \
+	task.c \
+	notify_fs.c
 
 server: $(SRV_SRC)
 	gcc $(CFLAGS) -o $@ $^ -lpthread
