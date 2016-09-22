@@ -4,3 +4,7 @@ client
 daemon
 server
 .tag*
+GPATH
+GRTAGS
+GTAGS
+.projectile
