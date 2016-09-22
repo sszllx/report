@@ -13,6 +13,11 @@
 #include "event_loop.h"
 #include "report_socket.h"
 
+typedef struct {
+    event_loop_mgr_t *loop_mgr;
+    pid_t client_pid;
+} monitor_mgr_t;
+
 static UNUSED int daemonize()
 {
     pid_t pid, sid;
@@ -62,11 +67,12 @@ void sig_handle(int sig)
 }
 
 static void *
-read_cb(event_loop_mgr_t *mgr, int sock)
+read_cb(int sock, void *private_data)
 {
     int rlen;
     char buffer[PACKAGE_SIZE];
     report_header_t *rhdr;
+    // monitor_mgr_t *mgr = (monitor_mgr_t *)private_data;
 
  retry:
     rlen = read(sock, buffer, PACKAGE_SIZE);
@@ -96,7 +102,7 @@ read_cb(event_loop_mgr_t *mgr, int sock)
 }
 
 static UNUSED void *
-client_monitor(event_loop_mgr_t *mgr, int sock)
+client_monitor(int sock, void *private_data)
 {
     printf("%s %d \n", __FUNCTION__, __LINE__);
     return NULL;
@@ -108,7 +114,8 @@ int main(int argc, char const *argv[])
     pid_t pid;
     int sock[2];
     int ret;
-    event_loop_mgr_t *mgr;
+    monitor_mgr_t *mgr;
+    event_loop_mgr_t *loop_mgr;
     int server_sock;
 
     signal(SIGCHLD, sig_handle);
@@ -137,18 +144,23 @@ int main(int argc, char const *argv[])
 
     close (sock[1]);
 
+    mgr = calloc(1, sizeof(monitor_mgr_t));
+    mgr->client_pid = pid;
+
     server_sock = connect_server();
     if (server_sock < 0) {
         perror("update connect server failed\n");
         return 1;
     }
 
-    mgr = event_loop_init ();
-    event_loop_read_add (mgr, sock[0], client_monitor);
-    event_loop_read_add (mgr, server_sock, read_cb);
-    event_loop_enter (mgr);
+    loop_mgr = event_loop_init ();
+    mgr->loop_mgr = loop_mgr;
 
-    // close (sock[0]);
+    event_loop_read_add (loop_mgr, sock[0], client_monitor, mgr);
+    event_loop_read_add (loop_mgr, server_sock, read_cb, mgr);
+    event_loop_enter (loop_mgr);
+
+    close (sock[0]);
 
     return 0;
 }

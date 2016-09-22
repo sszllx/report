@@ -5,22 +5,22 @@
 
 #include <errno.h>
 
-static void *read_cb(event_loop_mgr_t *mgr, int sock)
+static UNUSED void *read_cb(int sock, void *private_data)
 {
-    printf("dfasdfffffffffffffffffffffffff\n");
+    
     return NULL;
 }
 
 int
 create_client (int parent)
 {
-    int sock;
+    // int sock;
     event_loop_mgr_t *mgr;
     //    report_header_t *rhdr;
 
-    sock = connect_server ();
-    if (sock < 0)
-        return 1;
+    //    sock = connect_server ();
+    // if (sock < 0)
+    // return 1;
 
     /* rhdr = create_package (ADD_MSG, REQUEST, "test", 5); */
     /* if (rhdr == NULL) */
@@ -29,10 +29,10 @@ create_client (int parent)
     /* report_send (sock, rhdr); */
 
     mgr = event_loop_init ();
-    event_loop_read_add (mgr, parent, read_cb);
+    event_loop_read_add (mgr, parent, read_cb, NULL);
     event_loop_enter (mgr);
 
-    close (sock);
+    //    close (sock);
     return 0;
 }
 

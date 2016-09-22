@@ -15,6 +15,7 @@
 struct socket_cb_s {
     int sock;
     callback cb;
+    void *private_data;
 
     struct list_head list;
 };
@@ -66,7 +67,8 @@ event_loop_write_add(event_loop_mgr_t *mgr,
 int
 event_loop_read_add(event_loop_mgr_t *mgr,
                     int fd,
-                    callback cb)
+                    callback cb,
+                    void *private_data)
 {
     FD_SET(fd, &mgr->rfds);
     mgr->maxfd = mgr->maxfd > fd ? mgr->maxfd : (fd + 1);
@@ -74,6 +76,7 @@ event_loop_read_add(event_loop_mgr_t *mgr,
     socket_cb_t *scb = calloc(1, sizeof(socket_cb_t));
     scb->sock = fd;
     scb->cb = cb;
+    scb->private_data = private_data;
     list_add_tail(&scb->list, &mgr->sock_cb_list);
     return 0;
 }
@@ -116,12 +119,11 @@ int event_loop_enter(event_loop_mgr_t *mgr)
         } else if (ret) {
             printf("%s %d\n", __FUNCTION__, __LINE__);
             // TODO: omit efds and wfds
-            
             list_for_each (pos, &mgr->sock_cb_list) {
                 socket_cb_t *scb = list_entry (pos, socket_cb_t, list);
                 printf("%s %d scb:%d\n", __FUNCTION__, __LINE__, scb->sock);
                 if (FD_ISSET (scb->sock, &mgr->rfds)) {
-                    scb->cb(mgr, scb->sock);
+                    scb->cb(scb->sock, scb->private_data);
                     break;
                 } if (FD_ISSET (scb->sock, &mgr->wfds)) {
                     printf("%s %d\n", __FUNCTION__, __LINE__);
