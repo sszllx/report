@@ -14,36 +14,6 @@
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
-static UNUSED void handle_events(int fd, int wd)
-{
-    char buf[4096]
-        __attribute__ ((aligned(__alignof__(struct inotify_event))));
-    const struct inotify_event *event;
-    int len;
-    // int version;
-    char *ptr;
-
-retry:
-    len = read(fd, buf, sizeof buf);
-    if (len == -1 && errno == EINTR) {
-        goto retry;
-    } else {
-        perror("read");
-        return;
-    }
-
-    for (ptr = buf; ptr < buf + len;
-         ptr += sizeof(struct inotify_event) + event->len) {
-        event = (const struct inotify_event *) ptr;
-
-        if (wd == event->wd) {
-            printf("file changed: %s\n", event->name);
-        }
-    }
-
-
-}
-
 static void *start_notify_fs(void *arg)
 {
     server_mgr_t *mgr = (server_mgr_t *)arg;

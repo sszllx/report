@@ -136,8 +136,12 @@ static int get_version(int fd)
 
  retry:
     len = read(fd, buff, 16);
-    if (len < 0 && errno == EINTR) {
-        goto retry;
+    if (len < 0) {
+        if (errno == EINTR) {
+            goto retry;
+        }
+
+        return -1;
     }
 
     return atoi(buff);

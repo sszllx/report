@@ -21,7 +21,7 @@ typedef struct {
 static UNUSED int daemonize()
 {
     pid_t pid, sid;
-    int fd; 
+    int fd;
 
     if(getppid() == 1) {
         return -1;
@@ -76,8 +76,12 @@ read_cb(int sock, void *private_data)
 
  retry:
     rlen = read(sock, buffer, PACKAGE_SIZE);
-    if (rlen < 0 && errno == EINTR) {
-        goto retry;
+    if (rlen < 0) {
+        if (errno == EINTR) {
+            goto retry;
+        }
+
+        return NULL;
     }
 
     rhdr = (report_header_t *)buffer;
