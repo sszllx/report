@@ -145,8 +145,13 @@ report_header_t *report_recv(int sock, char **out_data)
 
 read_again:
     rlen = read (sock, rhdr, sizeof(report_header_t));
-    if (rlen < 0 && errno == EINTR)
-        goto read_again;
+    if (rlen < 0) {
+        if (errno == EINTR) {
+            goto read_again;
+        } else {
+            return NULL;
+        }
+    }
 
     if (rlen == 0) {
         close(sock);
